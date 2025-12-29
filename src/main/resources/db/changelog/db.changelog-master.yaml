@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: migrations/001-create-tables.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: migrations/002-add-fk.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: migrations/003-insert-test-data.yaml
+      relativeToChangelogFile: true
