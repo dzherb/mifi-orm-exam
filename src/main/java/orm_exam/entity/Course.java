@@ -3,7 +3,6 @@ package orm_exam.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.lang.Module;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
