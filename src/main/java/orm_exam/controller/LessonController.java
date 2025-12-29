@@ -1,0 +1,53 @@
+package orm_exam.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import orm_exam.dto.request.LessonRequest;
+import orm_exam.dto.response.LessonResponse;
+import orm_exam.entity.Lesson;
+import orm_exam.mapper.LessonMapper;
+import orm_exam.service.LessonService;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/lessons")
+@RequiredArgsConstructor
+public class LessonController {
+    private final LessonService lessonService;
+    private final LessonMapper lessonMapper;
+
+    @GetMapping
+    public List<LessonResponse> getAllLessons() {
+        return lessonService.getAllLessons().stream()
+                .map(lessonMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public LessonResponse getLessonById(@PathVariable Long id) {
+        Lesson lesson = lessonService.getLessonById(id);
+        return lessonMapper.toResponse(lesson);
+    }
+
+    @PostMapping
+    public LessonResponse createLesson(@RequestBody LessonRequest lessonRequest) {
+        Lesson lesson = lessonMapper.toEntity(lessonRequest);
+        Lesson createdLesson = lessonService.createLesson(lesson);
+        return lessonMapper.toResponse(createdLesson);
+    }
+
+    @PutMapping("/{id}")
+    public LessonResponse updateLesson(@PathVariable Long id, @RequestBody LessonRequest lessonRequest) {
+        Lesson updatedLesson = lessonService.updateLesson(id, lessonRequest);
+        return lessonMapper.toResponse(updatedLesson);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
+        lessonService.deleteLesson(id);
+        return ResponseEntity.noContent().build();
+    }
+}

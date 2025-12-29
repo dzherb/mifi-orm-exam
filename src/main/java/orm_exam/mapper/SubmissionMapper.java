@@ -1,0 +1,52 @@
+package orm_exam.mapper;
+
+import org.mapstruct.*;
+import orm_exam.dto.nested.AssignmentInfo;
+import orm_exam.dto.nested.UserInfo;
+import orm_exam.dto.request.SubmissionRequest;
+import orm_exam.dto.response.SubmissionResponse;
+import orm_exam.entity.Assignment;
+import orm_exam.entity.Submission;
+import orm_exam.entity.User;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {AssignmentMapper.class, UserMapper.class})
+public interface SubmissionMapper {
+    @Mapping(target = "assignment", source = "assignmentId", qualifiedByName = "assignmentIdToAssignment")
+    @Mapping(target = "student", source = "studentId", qualifiedByName = "submissionStudentIdToUser")
+    Submission toEntity(SubmissionRequest request);
+
+    @Mapping(target = "assignment", source = "assignment", qualifiedByName = "assignmentToAssignmentInfo")
+    @Mapping(target = "student", source = "student", qualifiedByName = "userToUserInfo")
+    SubmissionResponse toResponse(Submission submission);
+
+    @Named("assignmentToAssignmentInfo")
+    default AssignmentInfo assignmentToAssignmentInfo(Assignment assignment) {
+        if (assignment == null) {
+            return null;
+        }
+        AssignmentInfo assignmentInfo = new AssignmentInfo();
+        assignmentInfo.setId(assignment.getId());
+        assignmentInfo.setTitle(assignment.getTitle());
+        return assignmentInfo;
+    }
+
+    @Named("assignmentIdToAssignment")
+    default Assignment assignmentIdToAssignment(Long assignmentId) {
+        if (assignmentId == null) {
+            return null;
+        }
+        Assignment assignment = new Assignment();
+        assignment.setId(assignmentId);
+        return assignment;
+    }
+
+    @Named("submissionStudentIdToUser")
+    default User submissionStudentIdToUser(Long studentId) {
+        if (studentId == null) {
+            return null;
+        }
+        User user = new User();
+        user.setId(studentId);
+        return user;
+    }
+}

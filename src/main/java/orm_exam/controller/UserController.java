@@ -1,0 +1,52 @@
+package orm_exam.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import orm_exam.dto.request.UserRequest;
+import orm_exam.dto.response.UserResponse;
+import orm_exam.entity.User;
+import orm_exam.mapper.UserMapper;
+import orm_exam.service.UserService;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService;
+    private final UserMapper userMapper;
+
+    @GetMapping
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers().stream()
+                .map(userMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return userMapper.toResponse(user);
+    }
+
+    @PostMapping
+    public UserResponse createUser(@RequestBody UserRequest userRequest) {
+        User user = userMapper.toEntity(userRequest);
+        User createdUser = userService.createUser(user);
+        return userMapper.toResponse(createdUser);
+    }
+    @PutMapping("/{id}")
+    public UserResponse updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
+        User updatedUser = userService.updateUser(id, userRequest);
+        return userMapper.toResponse(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+}
